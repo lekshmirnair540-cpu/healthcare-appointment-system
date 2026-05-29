@@ -1,0 +1,34 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Install SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+      
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+          cd ~/healthcare-booking
+          git pull origin main
+          source venv/bin/activate
+          pip install -r requirements.txt
+          screen -X -S healthcare quit || true
+          screen -dmS healthcare bash -c "cd ~/healthcare-booking && source venv/bin/activate && python run.py"
+          sudo systemctl restart nginx
+          echo "Deployment completed at $(date)" >> deploy.log
+        EOF
