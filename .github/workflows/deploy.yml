@@ -8,17 +8,21 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
       
-      - name: Deploy
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: 3.110.127.186
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            echo "Connected to EC2"
-            cd /home/ubuntu/healthcare-booking
-            git pull origin main
-            echo "Deployment successful"
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd ~/healthcare-booking
+          git pull origin main
+          source venv/bin/activate
+          pip install -r requirements.txt
+          sudo systemctl restart nginx
+          echo "Deployment completed at $(date)" >> deploy.log
