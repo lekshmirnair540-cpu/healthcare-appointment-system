@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
 from datetime import datetime
-import pymysql
 import os
 
 # Get absolute paths
@@ -21,9 +20,12 @@ if os.path.exists(TEMPLATE_DIR):
 app = Flask(__name__, template_folder=TEMPLATE_DIR)
 app.config['SECRET_KEY'] = 'your-secret-key-change-this'
 
-# MySQL Configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Newroot123@localhost/healthcare_db'
+# ==================== SQLITE DATABASE ====================
+# Using SQLite - simple file-based database, no MySQL needed
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///healthcare.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+print(f"🗄️ Using SQLite database at: {os.path.join(BASE_DIR, 'healthcare.db')}")
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -101,25 +103,14 @@ class Appointment(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# ==================== CREATE DATABASE AND TABLES ====================
+# ==================== CREATE TABLES AND SEED DATA ====================
 
 def create_database():
-    try:
-        connection = pymysql.connect(
-            host='localhost',
-            user='root',
-            password='Newroot123',
-            charset='utf8mb4'
-        )
-        cursor = connection.cursor()
-        cursor.execute("CREATE DATABASE IF NOT EXISTS healthcare_db")
-        cursor.close()
-        connection.close()
-        print("✅ Database 'healthcare_db' is ready")
-    except Exception as e:
-        print(f"⚠️ Error creating database: {e}")
-        print("Make sure MySQL is running")
+    """SQLite doesn't need database creation"""
+    print("✅ SQLite database is ready (file-based, no setup needed)")
+    pass
 
+# Call the function (does nothing but keeps compatibility)
 create_database()
 
 with app.app_context():
@@ -416,7 +407,6 @@ def admin_dashboard():
                          active_doctors=Doctor.query.filter_by(is_available=True).count(),
                          completion_rate=85)
 
-# ADMIN - Doctor Management
 @app.route('/admin/doctors')
 @login_required
 def manage_doctors():
@@ -523,7 +513,6 @@ def delete_doctor(doctor_id):
     flash('Doctor deleted successfully', 'success')
     return redirect(url_for('manage_doctors'))
 
-# ADMIN - User Management
 @app.route('/admin/users')
 @login_required
 def manage_users():
@@ -564,7 +553,6 @@ def delete_user(user_id):
     flash(f'User {user.name} deleted successfully!', 'success')
     return redirect(url_for('manage_users'))
 
-# ADMIN - Appointment Management
 @app.route('/admin/appointments')
 @login_required
 def admin_appointments():
