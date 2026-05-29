@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">My Appointments</h1>
+      <p class="page-subtitle">Track and manage all your bookings</p>
+    </div>
+    <a href="/appointments/book" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Book new appointment
+    </a>
+  </div>
+
+  {% if appointments %}
+    <!-- Summary pills -->
+    {% set pending_count = appointments | selectattr('status', 'equalto', 'pending') | list | length %}
+    {% set confirmed_count = appointments | selectattr('status', 'equalto', 'confirmed') | list | length %}
+    <div style="display:flex; gap:10px; margin-bottom:1.5rem; flex-wrap:wrap;">
+      <div style="background:var(--white); border:1px solid var(--border); border-radius:var(--radius-md); padding:8px 16px; font-size:13px; color:var(--slate);">
+        <strong style="color:var(--navy);">{{ appointments|length }}</strong> total
+      </div>
+      {% if pending_count > 0 %}
+      <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:var(--radius-md); padding:8px 16px; font-size:13px; color:#92400e;">
+        <strong>{{ pending_count }}</strong> pending
+      </div>
+      {% endif %}
+      {% if confirmed_count > 0 %}
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-md); padding:8px 16px; font-size:13px; color:#166534;">
+        <strong>{{ confirmed_count }}</strong> confirmed
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Doctor</th>
+              <th>Specialization</th>
+              <th>Date & Time</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appointment in appointments %}
+            <tr>
+              <td>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div class="avatar" style="background:#ede9fe; color:#5b21b6; font-size:13px;">
+                    {{ appointment.doctor.user.name[0] if appointment.doctor and appointment.doctor.user else 'D' }}
+                  </div>
+                  <div>
+                    <div style="font-weight:600; color:var(--navy); font-size:14px;">Dr. {{ appointment.doctor.user.name if appointment.doctor and appointment.doctor.user else 'Unknown' }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span style="font-size:13px; color:var(--muted);">
+                  {{ appointment.doctor.specialization.name if appointment.doctor and appointment.doctor.specialization else 'General' }}
+                </span>
+              </td>
+              <td>
+                <div style="font-weight:500; color:var(--navy); font-size:14px;">{{ appointment.appointment_dt.strftime('%d %b %Y') if appointment.appointment_dt else 'N/A' }}</div>
+                <div style="font-size:12px; color:var(--muted);">{{ appointment.appointment_dt.strftime('%I:%M %p') if appointment.appointment_dt else 'N/A' }}</div>
+              </td>
+              <td style="max-width:180px;">
+                <span style="font-size:13px; color:var(--muted);">{{ appointment.reason if appointment.reason else '—' }}</span>
+              </td>
+              <td>
+                <span class="badge badge-{{ appointment.status }}">
+                  <span class="badge-dot"></span>
+                  {{ appointment.status | capitalize }}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 8px;">
+                  {% if appointment.status == 'pending' %}
+                    <a href="/appointments/{{ appointment.id }}/edit" class="btn btn-outline btn-sm">Edit</a>
+                  {% endif %}
+                  {% if appointment.status != 'cancelled' and appointment.appointment_dt and appointment.appointment_dt > now %}
+                    <form method="POST" action="/appointments/{{ appointment.id }}/cancel" onsubmit="return confirm('Cancel this appointment?')" style="display: inline;">
+                      <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  {% else %}
+    <div class="card">
+      <div class="empty">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+            <line x1="12" y1="14" x2="12" y2="18"/>
+            <line x1="10" y1="16" x2="14" y2="16"/>
+          </svg>
+        </div>
+        <h3>No appointments yet</h3>
+        <p>Book your first appointment with one of our qualified doctors.</p>
+        <a href="/appointments/book" class="btn btn-primary">Book an appointment →</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

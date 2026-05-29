@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HealthBook — Smart Medical Appointments</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:       #0d9488;
+      --teal-dark:  #0f766e;
+      --teal-light: #ccfbf1;
+      --teal-mid:   #99f6e4;
+      --navy:       #0f172a;
+      --navy-mid:   #1e293b;
+      --slate:      #334155;
+      --muted:      #64748b;
+      --soft:       #94a3b8;
+      --border:     #e2e8f0;
+      --bg:         #f8fafc;
+      --white:      #ffffff;
+      --success:    #059669;
+      --warning:    #d97706;
+      --danger:     #dc2626;
+      --info:       #0284c7;
+      --radius-sm:  6px;
+      --radius-md:  10px;
+      --radius-lg:  16px;
+      --radius-xl:  24px;
+      --shadow-sm:  0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+      --shadow-md:  0 4px 16px rgba(15,23,42,0.08), 0 2px 6px rgba(15,23,42,0.05);
+      --shadow-lg:  0 12px 40px rgba(15,23,42,0.12), 0 4px 12px rgba(15,23,42,0.06);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--navy);
+    }
+    .nav-brand-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-brand-icon svg { width: 20px; height: 20px; }
+    .nav-brand-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--navy);
+    }
+    .nav-brand-name span { color: var(--teal); }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-user {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 0 12px;
+    }
+    .nav-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .nav-badge.admin { background: #fef3c7; color: #92400e; }
+    .nav-badge.patient { background: var(--teal-light); color: var(--teal-dark); }
+    .nav-badge.doctor { background: #ede9fe; color: #5b21b6; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 500;
+      padding: 8px 18px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--teal);
+      color: white;
+      border-color: var(--teal);
+    }
+    .btn-primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
+    .btn-outline {
+      background: transparent;
+      color: var(--navy);
+      border-color: var(--border);
+    }
+    .btn-outline:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border-color: transparent;
+    }
+    .btn-ghost:hover { background: var(--bg); color: var(--navy); }
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+    .btn-danger:hover { background: #fef2f2; }
+    .btn-sm { font-size: 13px; padding: 5px 12px; }
+    .btn-lg { font-size: 16px; padding: 13px 28px; border-radius: var(--radius-lg); }
+
+    /* ── ALERTS ── */
+    .alerts { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem 0; }
+    .alert {
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid transparent;
+      animation: slideIn 0.2s ease;
+    }
+    @keyframes slideIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform:none; } }
+    .alert-success { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+    .alert-danger  { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+    .alert-info    { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+    .alert-warning { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+
+    /* ── PAGE WRAPPER ── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
+    .page-sm { max-width: 500px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+    .card-body { padding: 2rem; }
+    .card-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    /* ── FORMS ── */
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate);
+      margin-bottom: 6px;
+      letter-spacing: 0.01em;
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--navy);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-control:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+    }
+    select.form-control { cursor: pointer; }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+
+    /* ── TABLES ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--bg); }
+    th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 14px 16px;
+      font-size: 14px;
+      color: var(--slate);
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafbfc; }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .badge-pending  { background: #fffbeb; color: #92400e; }
+    .badge-pending .badge-dot  { background: #f59e0b; }
+    .badge-confirmed{ background: #f0fdf4; color: #166534; }
+    .badge-confirmed .badge-dot{ background: #22c55e; }
+    .badge-cancelled{ background: #f8fafc; color: var(--muted); }
+    .badge-cancelled .badge-dot{ background: var(--soft); }
+    .badge-admin  { background: #fef3c7; color: #92400e; }
+    .badge-patient{ background: var(--teal-light); color: var(--teal-dark); }
+    .badge-doctor { background: #ede9fe; color: #5b21b6; }
+
+    /* ── STAT CARDS ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .stat-icon svg { width: 20px; height: 20px; }
+    .stat-value { font-size: 28px; font-weight: 600; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 13px; color: var(--muted); }
+
+    /* ── PAGE HEADER ── */
+    .page-head { margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .page-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--navy); }
+    .page-subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .empty-icon {
+      width: 64px; height: 64px;
+      background: var(--teal-light);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+    }
+    .empty-icon svg { width: 28px; height: 28px; color: var(--teal); }
+    .empty h3 { font-size: 18px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+    .empty p { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; }
+
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+    /* ── AVATAR ── */
+    .avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ── UTILITY ── */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .text-muted { color: var(--muted); font-size: 13px; }
+    .fw-600 { font-weight: 600; }
+    .mb-0 { margin-bottom: 0; }
+    .mt-1 { margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="/">
+      <div class="nav-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+      </div>
+      <span class="nav-brand-name">Health<span>Book</span></span>
+    </a>
+    <div class="nav-links">
+      {% if current_user.is_authenticated %}
+        <span class="nav-user">{{ current_user.name }}</span>
+        <span class="nav-badge {{ current_user.role }}">{{ current_user.role }}</span>
+        {% if current_user.role == 'admin' %}
+          <a class="btn btn-outline btn-sm" href="/admin/dashboard">Dashboard</a>
+        {% else %}
+          <a class="btn btn-outline btn-sm" href="/appointments">My Appointments</a>
+        {% endif %}
+        <a class="btn btn-ghost btn-sm" href="/logout">Sign out</a>
+      {% else %}
+        <a class="btn btn-ghost btn-sm" href="/login">Sign in</a>
+        <a class="btn btn-primary btn-sm" href="/register">Get started</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="alerts">
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          {{ msg }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+</body>
+</html>

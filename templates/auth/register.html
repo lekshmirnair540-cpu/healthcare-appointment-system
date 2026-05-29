@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.auth-wrap {
+  min-height: calc(100vh - 64px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 3rem 1.5rem;
+}
+.auth-card {
+  width: 100%; max-width: 460px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.auth-top {
+  background: var(--navy);
+  padding: 2.5rem 2.5rem 2rem;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.auth-top::before {
+  content:''; position:absolute; top:-60px; left:50%;
+  transform: translateX(-50%);
+  width:300px; height:300px;
+  background: radial-gradient(circle, rgba(13,148,136,0.3) 0%, transparent 70%);
+  pointer-events:none;
+}
+.auth-icon {
+  width:56px; height:56px;
+  background: rgba(255,255,255,0.1);
+  border-radius: var(--radius-lg);
+  display:flex; align-items:center; justify-content:center;
+  margin: 0 auto 1.25rem;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.auth-top h1 { font-family:'DM Serif Display',serif; font-size:26px; color:white; margin-bottom:6px; }
+.auth-top p { font-size:14px; color:#94a3b8; }
+.auth-body { padding: 2.5rem; }
+.auth-footer { text-align:center; padding:0 2.5rem 2rem; font-size:14px; color:var(--muted); }
+.auth-footer a { color:var(--teal); text-decoration:none; font-weight:500; }
+.input-icon-wrap { position:relative; }
+.input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--soft); pointer-events:none; }
+.input-icon svg { width:16px; height:16px; }
+.input-icon-wrap .form-control { padding-left:42px; }
+.perks { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:1.5rem; }
+.perk {
+  display:flex; align-items:center; gap:7px;
+  font-size:13px; color:var(--muted);
+}
+.perk-check { width:18px; height:18px; background:var(--teal-light); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.perk-check svg { width:10px; height:10px; }
+</style>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-top">
+      <div class="auth-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/>
+          <line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+      </div>
+      <h1>Create your account</h1>
+      <p>Start booking appointments in minutes</p>
+    </div>
+    <div class="auth-body">
+      <div class="perks">
+        <div class="perk">
+          <div class="perk-check"><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          Free to join
+        </div>
+        <div class="perk">
+          <div class="perk-check"><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          Secure & private
+        </div>
+        <div class="perk">
+          <div class="perk-check"><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          Instant booking
+        </div>
+        <div class="perk">
+          <div class="perk-check"><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          Manage online
+        </div>
+      </div>
+      <form method="POST">
+        <div class="form-group">
+          <label class="form-label">Full name</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <input type="text" name="name" class="form-control" placeholder="Your full name" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+            <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span style="color:var(--soft);font-weight:400;">(min. 8 characters)</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+            <input type="password" name="password" class="form-control" placeholder="Choose a strong password" minlength="8" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:15px; margin-top:4px;">
+          Create my account →
+        </button>
+      </form>
+    </div>
+    <div class="auth-footer">
+      Already have an account? <a href="/login">Sign in here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

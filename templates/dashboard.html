@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Admin Dashboard</h1>
+      <p class="page-subtitle">Welcome back, {{ current_user.name if current_user else 'Admin' }}</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+    <a href="/admin/users" class="card" style="text-decoration: none; display: block; text-align: center; padding: 1.5rem;">
+      <div style="font-size: 2rem;">👥</div>
+      <div style="font-size: 2rem; font-weight: bold;">{{ total_users|default(0) }}</div>
+      <div style="color: var(--muted);">Total Users</div>
+    </a>
+    <a href="/admin/appointments" class="card" style="text-decoration: none; display: block; text-align: center; padding: 1.5rem;">
+      <div style="font-size: 2rem;">📅</div>
+      <div style="font-size: 2rem; font-weight: bold;">{{ total_appointments|default(0) }}</div>
+      <div style="color: var(--muted);">Total Appointments</div>
+    </a>
+    <a href="/admin/doctors" class="card" style="text-decoration: none; display: block; text-align: center; padding: 1.5rem;">
+      <div style="font-size: 2rem;">👨‍⚕️</div>
+      <div style="font-size: 2rem; font-weight: bold;">{{ total_doctors|default(0) }}</div>
+      <div style="color: var(--muted);">Total Doctors</div>
+    </a>
+    <div class="card" style="text-align: center; padding: 1.5rem;">
+      <div style="font-size: 2rem;">⏳</div>
+      <div style="font-size: 2rem; font-weight: bold;">{{ pending_appointments|default(0) }}</div>
+      <div style="color: var(--muted);">Pending</div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+    <a href="/admin/doctors" class="btn btn-primary">👨‍⚕️ Manage Doctors</a>
+    <a href="/admin/doctors/add" class="btn btn-success">➕ Add New Doctor</a>
+    <a href="/admin/users" class="btn btn-outline">👥 View All Users</a>
+    <a href="/admin/appointments" class="btn btn-outline">📋 View All Appointments</a>
+  </div>
+
+  <!-- Recent Appointments -->
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <div class="card-header">📋 Recent Appointments</div>
+    <div class="card-body">
+      {% if recent_appointments %}
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for apt in recent_appointments %}
+              <tr>
+                <td>{{ apt.patient_name }}</td>
+                <td>Dr. {{ apt.doctor_name }}</td>
+                <td>{{ apt.date }}</td>
+                <td><span class="badge badge-{{ apt.status }}">{{ apt.status }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p>No recent appointments</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Recently Joined Doctors -->
+  <div class="card">
+    <div class="card-header">👩‍⚕️ Recently Joined Doctors</div>
+    <div class="card-body">
+      {% if recent_doctors %}
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Doctor</th><th>Specialization</th><th>Joined</th></tr></thead>
+            <tbody>
+              {% for doc in recent_doctors %}
+              <tr>
+                <td>Dr. {{ doc.name }}</td>
+                <td>{{ doc.specialization }}</td>
+                <td>{{ doc.joined_date }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p>No doctors added yet</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Manage Doctors</h1>
+      <p class="page-subtitle">{{ doctors|length }} doctors on the platform</p>
+    </div>
+    <a href="/admin/doctors/add" class="btn btn-primary">+ Add Doctor</a>
+    <a href="/admin/dashboard" class="btn btn-outline">← Dashboard</a>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr><th>Doctor</th><th>Specialization</th><th>Email</th><th>Experience</th><th>Fee</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for doctor in doctors %}
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="avatar" style="background: #ede9fe; color: #5b21b6; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                  {{ doctor.user.name[0]|upper }}
+                </div>
+                <div>
+                  <div style="font-weight: 600;">Dr. {{ doctor.user.name }}</div>
+                  <div style="font-size: 12px; color: #64748b;">{{ doctor.qualification or 'N/A' }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ doctor.specialization.name if doctor.specialization else 'General' }}</td>
+            <td>{{ doctor.user.email }}</td>
+            <td>{{ doctor.experience_years }} years</td>
+            <td>₹{{ doctor.consultation_fee }}</td>
+            <td>
+              <a href="/admin/doctors/{{ doctor.id }}/edit" class="btn btn-outline btn-sm">Edit</a>
+              <form method="POST" action="/admin/doctors/{{ doctor.id }}/delete" style="display: inline;" onsubmit="return confirm('Delete this doctor?')">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

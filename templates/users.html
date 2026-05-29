@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Users</h1>
+      <p class="page-subtitle">{{ users|length }} registered account{% if users|length != 1 %}s{% endif %}</p>
+    </div>
+    <a href="/admin/dashboard" class="btn btn-outline">← Back to Dashboard</a>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="avatar" style="width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #ccfbf1; color: #0f766e;">
+                  {{ user.name[0]|upper }}
+                </div>
+                <span style="font-weight: 600;">{{ user.name }}</span>
+              </div>
+            </td>
+            <td>{{ user.email }}</td>
+            <td>
+              {% if user.role == 'admin' %}
+                <span class="badge badge-admin">Admin</span>
+              {% elif user.role == 'doctor' %}
+                <span class="badge badge-doctor">Doctor</span>
+              {% else %}
+                <span class="badge badge-patient">Patient</span>
+              {% endif %}
+            </td>
+            <td>{{ user.created_at.strftime('%d %b %Y') if user.created_at else 'N/A' }}</td>
+            <td>
+              {% if user.role != 'admin' %}
+                <form method="POST" action="/admin/users/{{ user.id }}/delete" onsubmit="return confirm('Delete user {{ user.name }}? This will also delete all their appointments.')" style="display: inline;">
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              {% else %}
+                <span style="color: var(--soft); font-size: 12px;">Protected</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

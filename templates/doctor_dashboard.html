@@ -1,0 +1,38 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-head">
+    <h1 class="page-title">Doctor Dashboard</h1>
+    <p class="page-subtitle">Welcome, Dr. {{ current_user.name }}</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">My Appointments</div>
+    <div class="card-body">
+      {% if appointments %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Patient</th><th>Date & Time</th><th>Reason</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              {% for apt in appointments %}
+              <tr>
+                <td>{{ apt.patient.name if apt.patient else 'N/A' }}</td>
+                <td>{{ apt.appointment_dt.strftime('%Y-%m-%d %H:%M') if apt.appointment_dt else 'N/A' }}</td>
+                <td>{{ apt.reason or '—' }}</td>
+                <td><span class="badge badge-{{ apt.status }}">{{ apt.status }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty">No appointments yet.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+"@ | Out-File -FilePath templates\doctor_dashboard.html -Encoding utf8

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">All Appointments</h1>
+      <p class="page-subtitle">Manage all bookings on the platform</p>
+    </div>
+    <a href="/admin/dashboard" class="btn btn-outline">← Back to Dashboard</a>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Date & Time</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for apt in appointments %}
+          <tr>
+            <td>#{{ apt.id }}</td>
+            <td>{{ apt.patient.name if apt.patient else 'N/A' }}</td>
+            <td>Dr. {{ apt.doctor.user.name if apt.doctor and apt.doctor.user else 'N/A' }}</td>
+            <td>{{ apt.appointment_dt.strftime('%Y-%m-%d %H:%M') if apt.appointment_dt else 'N/A' }}</td>
+            <td>{{ apt.reason[:50] if apt.reason else '—' }}</td>
+            <td>
+              <span class="badge badge-{{ apt.status }}">
+                {{ apt.status | capitalize }}
+              </span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 8px;">
+                {% if apt.status == 'pending' %}
+                <form method="POST" action="/admin/appointments/{{ apt.id }}/confirm" style="display: inline;">
+                  <button type="submit" class="btn btn-success btn-sm">Confirm</button>
+                </form>
+                {% endif %}
+                <form method="POST" action="/admin/appointments/{{ apt.id }}/delete" onsubmit="return confirm('Delete this appointment?')" style="display: inline;">
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

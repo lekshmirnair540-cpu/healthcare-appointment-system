@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Manage Doctors</h1>
+      <p class="page-subtitle">{{ doctors|length }} doctors on the platform</p>
+    </div>
+    <a href="/admin/doctors/add" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add New Doctor
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Doctor</th><th>Specialization</th><th>Email</th><th>Experience</th><th>Fee</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for doctor in doctors %}
+          <tr>
+            <td>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="avatar" style="background:#ede9fe; color:#5b21b6;">{{ doctor.user.name[0]|upper }}</div>
+                <div>
+                  <div style="font-weight:600;">Dr. {{ doctor.user.name }}</div>
+                  <div style="font-size:12px; color:var(--muted);">{{ doctor.qualification or 'N/A' }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ doctor.specialization.name if doctor.specialization else 'General' }}</td>
+            <td style="color:var(--muted);">{{ doctor.user.email }}</td>
+            <td>{{ doctor.experience_years }} years</td>
+            <td>₹{{ doctor.consultation_fee }}</td>
+            <td>
+              <form method="POST" action="/admin/doctors/{{ doctor.id }}/delete" style="display:inline;" onsubmit="return confirm('Delete this doctor?')">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

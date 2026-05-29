@@ -1,0 +1,54 @@
+@"
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Edit Appointment</h1>
+      <p class="page-subtitle">Update your appointment details</p>
+    </div>
+    <a href="/appointments" class="btn btn-outline">← Back to appointments</a>
+  </div>
+
+  <div style="max-width: 600px;">
+    <div class="card">
+      <div class="card-body">
+        <form method="POST">
+          <div class="form-group">
+            <label class="form-label">Select Doctor</label>
+            <select name="doctor_id" class="form-control" required>
+              <option value="">Choose a doctor...</option>
+              {% for doc in doctors %}
+              <option value="{{ doc.id }}" {% if appointment.doctor_id == doc.id %}selected{% endif %}>
+                Dr. {{ doc.user.name }} - {{ doc.specialization.name if doc.specialization else 'General' }} (₹{{ doc.consultation_fee }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Appointment Date & Time</label>
+            <input type="datetime-local" name="appointment_dt" class="form-control" 
+                   value="{{ formatted_datetime }}" 
+                   min="{{ now.strftime('%Y-%m-%dT%H:%M') if now else '' }}" required>
+            <small style="color: var(--muted);">Current: {{ appointment.appointment_dt.strftime('%Y-%m-%d %H:%M') if appointment.appointment_dt else 'N/A' }}</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reason / Symptoms</label>
+            <textarea name="reason" class="form-control" rows="3">{{ appointment.reason or '' }}</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <div>
+              <span class="badge badge-{{ appointment.status }}">{{ appointment.status | capitalize }}</span>
+              <small style="color: var(--muted); margin-left: 10px;">Only pending appointments can be edited</small>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <a href="/appointments" class="btn btn-outline">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+"@ | Out-File -FilePath templates\edit_appointment.html -Encoding utf8

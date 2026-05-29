@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+/* dashboard specific overrides & stats cards */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+@media (max-width: 1000px) {
+  .dashboard-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 560px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.25rem;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card:hover {
+  border-color: var(--teal-mid);
+  box-shadow: var(--shadow-sm);
+}
+.stat-icon {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  opacity: 0.2;
+}
+.stat-icon svg {
+  width: 32px;
+  height: 32px;
+  stroke: var(--navy);
+  stroke-width: 1.5;
+}
+.stat-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'DM Serif Display', serif;
+  color: var(--navy);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.stat-trend {
+  font-size: 12px;
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stat-trend svg {
+  width: 12px;
+  height: 12px;
+}
+.admin-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 1.75rem 0 1rem;
+  font-family: 'DM Serif Display', serif;
+}
+.admin-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 720px) {
+  .admin-grid-2 { grid-template-columns: 1fr; }
+}
+.recent-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-light);
+  padding: 10px 0;
+}
+.recent-item:last-child { border-bottom: none; }
+.recent-doc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.recent-avatar {
+  width: 32px; height: 32px;
+  background: var(--teal-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--teal-dark);
+}
+.recent-name { font-size: 13px; font-weight: 500; color: var(--navy); }
+.recent-meta { font-size: 11px; color: var(--soft); margin-top: 2px; }
+.recent-status { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.status-confirmed { background: #e0f2fe; color: #0369a1; }
+.status-pending { background: #fffbeb; color: #b45309; }
+.status-completed { background: #e0f2e9; color: #0f766e; }
+.quick-link-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.quick-link {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.quick-link:hover {
+  border-color: var(--teal);
+  background: var(--teal-light);
+  color: var(--teal-dark);
+}
+</style>
+
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Admin dashboard</h1>
+      <p class="page-subtitle">Welcome back, {{ current_user.name if current_user else 'Admin' }}. Here's what's happening today.</p>
+    </div>
+    <div>
+      <a href="/admin/doctors" class="btn btn-outline btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Manage doctors
+      </a>
+      <a href="/admin/users" class="btn btn-outline btn-sm" style="margin-left:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </a>
+    </div>
+  </div>
+
+  <!-- STATS CARDS (dynamic values from backend context) -->
+  <div class="dashboard-grid">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="stat-label">Total users</div>
+      <div class="stat-number">{{ total_users|default(0) }}</div>
+      <div class="stat-trend">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        +{{ new_users_last_30d|default(0) }} this month
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+      </div>
+      <div class="stat-label">Total appointments</div>
+      <div class="stat-number">{{ total_appointments|default(0) }}</div>
+      <div class="stat-trend">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+        {{ pending_appointments|default(0) }} pending approval
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      </div>
+      <div class="stat-label">Doctors</div>
+      <div class="stat-number">{{ total_doctors|default(0) }}</div>
+      <div class="stat-trend">{{ active_doctors|default(0) }} active practitioners</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      <div class="stat-label">Completion rate</div>
+      <div class="stat-number">{{ completion_rate|default(84) }}%</div>
+      <div class="stat-trend">+5% from last month</div>
+    </div>
+  </div>
+
+  <!-- two columns: recent activity & quick actions -->
+  <div class="admin-grid-2">
+    <!-- Recent appointments -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div style="font-weight:600; color:var(--navy);">📋 Recent appointments</div>
+          <div style="font-size:12px; color:var(--muted);">Last 5 bookings</div>
+        </div>
+        <a href="/appointments" class="btn-sm" style="font-size:12px;">View all →</a>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        {% if recent_appointments %}
+          {% for apt in recent_appointments %}
+          <div class="recent-item">
+            <div class="recent-doc">
+              <div class="recent-avatar">{{ apt.patient_name[0] if apt.patient_name else 'P' }}</div>
+              <div>
+                <div class="recent-name">{{ apt.patient_name or 'Patient' }}</div>
+                <div class="recent-meta">Dr. {{ apt.doctor_name }} • {{ apt.date }}</div>
+              </div>
+            </div>
+            <span class="recent-status 
+              {% if apt.status == 'confirmed' %}status-confirmed
+              {% elif apt.status == 'pending' %}status-pending
+              {% else %}status-completed{% endif %}">
+              {{ apt.status|capitalize }}
+            </span>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty" style="padding:2rem 0; text-align:center;">
+            <p style="font-size:13px; color:var(--soft);">No recent appointments</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quick actions + recent doctors -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div style="font-weight:600; color:var(--navy);">⚡ Quick actions</div>
+          <div style="font-size:12px; color:var(--muted);">Manage the platform</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="quick-link-grid">
+          <a href="/admin/doctors/add" class="quick-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add doctor
+          </a>
+          <a href="/admin/users" class="quick-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            View users
+          </a>
+          <a href="/appointments" class="quick-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+            All bookings
+          </a>
+          <a href="/admin/settings" class="quick-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+          </a>
+        </div>
+        <hr class="divider" style="margin: 1rem 0;">
+        <div style="font-weight:500; font-size:13px; margin-bottom:10px; color:var(--navy);">👩‍⚕️ Recently joined doctors</div>
+        {% if recent_doctors %}
+          {% for doc in recent_doctors %}
+          <div class="recent-item">
+            <div class="recent-doc">
+              <div class="recent-avatar" style="background:#ede9fe; color:#5b21b6;">{{ doc.name[0] }}</div>
+              <div>
+                <div class="recent-name">Dr. {{ doc.name }}</div>
+                <div class="recent-meta">{{ doc.specialization or 'General' }} • joined {{ doc.joined_date }}</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="font-size:13px; color:var(--soft);">No doctors added yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- System health / quick stats row -->
+  <div class="card" style="margin-top:0.5rem;">
+    <div class="card-body" style="padding:1rem 1.5rem;">
+      <div style="display:flex; flex-wrap:wrap; gap:1.5rem; align-items:center; justify-content:space-between;">
+        <div style="display:flex; gap:24px; flex-wrap:wrap;">
+          <div><span style="font-size:12px; color:var(--muted);">Platform status</span><br><span style="font-weight:600; color:var(--teal);">🟢 Operational</span></div>
+          <div><span style="font-size:12px; color:var(--muted);">Last backup</span><br><span style="font-weight:500;">{{ last_backup|default('Today, 02:14 AM') }}</span></div>
+          <div><span style="font-size:12px; color:var(--muted);">Active sessions</span><br><span style="font-weight:500;">{{ active_sessions|default(12) }}</span></div>
+        </div>
+        <a href="/admin/logs" class="btn-sm" style="font-size:12px;">View system logs →</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
